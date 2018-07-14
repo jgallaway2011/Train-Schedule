@@ -1,0 +1,11 @@
+
+/* Adds background */
+body {
+    background: url("../images/dustScratches.png") #777777;
+}
+
+/* Adds margin and background-color to all buttons */
+.btn {
+    margin: 5px;
+    background-color: #4aaaa5
+}
