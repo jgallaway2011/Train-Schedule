@@ -95,13 +95,14 @@ $( document ).ready(function() {
 
     // Next Train
     var nextTrain = moment().add(minutesTillTrain, "minutes");
-    console.log("ARRIVAL TIME: " + moment(nextTrain).format("HH:mm"));
+    console.log("ARRIVAL TIME: " + moment(nextTrain, "X").format("HH:mm"));
+    var nextTrainFormatted = moment(nextTrain, "X").format("HH:mm");
 
         var trainTR = $("<tr>");
         var trainNameTD = $("<td>" + trainName + "</td>");
         var trainDestinationTD = $("<td>" + trainDestination + "</td>");
         var trainFrequencyTD = $("<td>" + trainFrequency + "</td>");
-        var trainNextArrivalTD = $("<td>" + nextTrain + "</td>");
+        var trainNextArrivalTD = $("<td>" + nextTrainFormatted + "</td>");
         var trainMinutesAwayTD = $("<td>" + minutesTillTrain + "</td>");
       
         trainTR.append(trainNameTD);
