@@ -60,7 +60,7 @@ $( document ).ready(function() {
         var trainFrequency = parseInt(childSnapshot.val().trainFrequency);;
 
         // First Time (pushed back 1 day to make sure it comes before current time)
-        var firstTimeConverted = moment(trainFirstTime, "HH:mm").subtract(1, "days");
+        var firstTimeConverted = moment(trainFirstTime, "X").subtract(1, "days");
 
         // Current Time
         var currentTime = moment();
