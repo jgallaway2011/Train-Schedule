@@ -1,10 +1,10 @@
+// Wait to run javascript until after DOM has loaded
 $( document ).ready(function() {
     console.log( "ready!" );
 
     // VARIABLES
     // ***************************************************************************************************************
 
-    // Initialize Firebase
     // Initialize Firebase
     var config = {
         apiKey: "AIzaSyCx-Bch_24M73NNlmrMeNn8OqeYBnQwRXM",
@@ -19,14 +19,10 @@ $( document ).ready(function() {
 
     var database = firebase.database();
 
-    // FUNCTIONS
-    //****************************************************************************************************************
-
-
     // MAIN PROCESS
     //***************************************************************************************************************    
 
-    // Run below code if any with a class of cartoonButton is clicked
+    // Run below code if submit button on form is clicked
     $("#train-submit").on("click", function (event) {
         event.preventDefault();
 
@@ -44,15 +40,10 @@ $( document ).ready(function() {
             trainFrequency: trainFrequency
         };
 
-        // Uploads employee data to the database
+        // Uploads train schedule data to the database
         database.ref().push(newTrain);
 
-        // Logs everything to console
-        console.log(newTrain.trainName);
-        console.log(newTrain.trainDestination);
-        console.log(newTrain.trainFirstTime);
-        console.log(newTrain.trainFrequency);
-
+        // Empty form fields once data has been submitted
         $("#train-name").val("");
         $("#train-destination").val("");
         $("#train-first-time").val("");
@@ -62,42 +53,32 @@ $( document ).ready(function() {
     // Looks in database for child added and will populate the data in our table
     database.ref().on("child_added", function(childSnapshot) {
       
-        // Store everything into a variable.
+        // Store firebase information into each child in the below variables
         var trainName = childSnapshot.val().trainName;
         var trainDestination = childSnapshot.val().trainDestination;
         var trainFirstTime = childSnapshot.val().trainFirstTime;
-        var trainFrequency = parseInt(childSnapshot.val().trainFrequency);
+        var trainFrequency = parseInt(childSnapshot.val().trainFrequency);;
 
-        console.log(trainName);
-        console.log(trainDestination);
-        console.log(moment(trainFirstTime, "X").format("HH:mm"));
-        console.log(trainFrequency);
+        // First Time (pushed back 1 day to make sure it comes before current time)
+        var firstTimeConverted = moment(trainFirstTime, "HH:mm").subtract(1, "days");
 
-    // First Time (pushed back 1 year to make sure it comes before current time)
-    var firstTimeConverted = moment(trainFirstTime, "HH:mm").subtract(1, "years");
-    console.log(firstTimeConverted);
+        // Current Time
+        var currentTime = moment();
 
-    // Current Time
-    var currentTime = moment();
-    console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+        // Difference between the times
+        var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
 
-    // Difference between the times
-    var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
-    console.log("DIFFERENCE IN TIME: " + diffTime);
+        // Time apart (remainder)
+        var trainTimeRemainder = diffTime % trainFrequency;
 
-    // Time apart (remainder)
-    var trainTimeRemainder = diffTime % trainFrequency;
-    console.log("Train Time Reamainder:" + trainTimeRemainder);
+        // Minutes Until Train
+        var minutesTillTrain = trainFrequency - trainTimeRemainder;
 
-    // Minute Until Train
-    var minutesTillTrain = trainFrequency - trainTimeRemainder;
-    console.log("MINUTES TILL TRAIN: " + minutesTillTrain);
+        // Next Train
+        var nextTrain = moment().add(minutesTillTrain, "minutes");
+        var nextTrainFormatted = moment(nextTrain, "X").format("HH:mm");
 
-    // Next Train
-    var nextTrain = moment().add(minutesTillTrain, "minutes");
-    console.log("ARRIVAL TIME: " + moment(nextTrain, "X").format("HH:mm"));
-    var nextTrainFormatted = moment(nextTrain, "X").format("HH:mm");
-
+        // Variables to create table
         var trainTR = $("<tr>");
         var trainNameTD = $("<td>" + trainName + "</td>");
         var trainDestinationTD = $("<td>" + trainDestination + "</td>");
@@ -105,12 +86,14 @@ $( document ).ready(function() {
         var trainNextArrivalTD = $("<td>" + nextTrainFormatted + "</td>");
         var trainMinutesAwayTD = $("<td>" + minutesTillTrain + "</td>");
       
+        // Append table data to table row
         trainTR.append(trainNameTD);
         trainTR.append(trainDestinationTD);
         trainTR.append(trainFrequencyTD);
         trainTR.append(trainNextArrivalTD);
         trainTR.append(trainMinutesAwayTD);
         
+        // Append table row to the table
         $("#train-table").append(trainTR);
       });
 });
